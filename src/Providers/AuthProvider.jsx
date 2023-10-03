@@ -5,39 +5,45 @@ import auth from "../firebase/firebase.config";
 
 export const AuthContext = createContext(null)
 
-const AuthProvider = ({children}) => {
+const AuthProvider = ({ children }) => {
 
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
 
-    const [user, setUser] = useState(null)
-
-    const createUser = (email, password) =>{
+    const createUser = (email, password) => {
+        setLoading(true);
         return createUserWithEmailAndPassword(auth, email, password)
     }
 
-    const signInUser = (email, password) =>{
+    const signInUser = (email, password) => {
+        setLoading(true);
         return signInWithEmailAndPassword(auth, email, password)
     }
 
-    const logOut = () =>{       //eikhane logOut neya hoise signOut nei nai karon vitore signOut firebase thika call kora jaibo na taile
+    const logOut = () => {       //eikhane logOut neya hoise signOut nei nai karon vitore signOut firebase thika call kora jaibo na taile
+        setLoading(true);
         return signOut(auth);   // return kori nai tai error dite silo log out er jonno
     }
 
     // observe auth state change
-    useEffect( () =>{
-        const unSubscribe = onAuthStateChanged(auth, currentUser =>{
+    useEffect(() => {
+        const unSubscribe = onAuthStateChanged(auth, currentUser => {
             console.log('current value of the current user', currentUser); //ei jinis gula aro onkber korbo
-            setUser(currentUser)
+            setUser(currentUser);
+            setLoading(false);
         });
-        return () =>{
+        return () => {
             unSubscribe()
         }
     }, [])
 
-    const authInfo = { user, 
-        createUser, 
+    const authInfo = {
+        user,
+        loading,
+        createUser,
         signInUser,
-        logOut 
-    }  
+        logOut
+    }
 
     return (
         <AuthContext.Provider value={authInfo}>
