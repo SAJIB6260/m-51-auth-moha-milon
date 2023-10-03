@@ -1,5 +1,5 @@
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
-import { createContext, useState } from "react";
+import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { createContext, useEffect, useState } from "react";
 import PropTypes from 'prop-types';
 import auth from "../firebase/firebase.config";
 
@@ -18,8 +18,26 @@ const AuthProvider = ({children}) => {
         return signInWithEmailAndPassword(auth, email, password)
     }
 
-    const authInfo = { user, createUser, signInUser }
-    
+    const logOut = () =>{       //eikhane logOut neya hoise signOut nei nai karon vitore signOut firebase thika call kora jaibo na taile
+        return signOut(auth);   // return kori nai tai error dite silo log out er jonno
+    }
+
+    // observe auth state change
+    useEffect( () =>{
+        const unSubscribe = onAuthStateChanged(auth, currentUser =>{
+            console.log('current value of the current user', currentUser); //ei jinis gula aro onkber korbo
+            setUser(currentUser)
+        });
+        return () =>{
+            unSubscribe()
+        }
+    }, [])
+
+    const authInfo = { user, 
+        createUser, 
+        signInUser,
+        logOut 
+    }  
 
     return (
         <AuthContext.Provider value={authInfo}>
