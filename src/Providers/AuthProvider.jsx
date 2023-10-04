@@ -1,9 +1,13 @@
-import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { GoogleAuthProvider, createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, signInWithPopup, signOut } from "firebase/auth";
 import { createContext, useEffect, useState } from "react";
 import PropTypes from 'prop-types';
 import auth from "../firebase/firebase.config";
 
-export const AuthContext = createContext(null)
+export const AuthContext = createContext(null);
+
+
+const googleProvider = new GoogleAuthProvider();
+
 
 const AuthProvider = ({ children }) => {
 
@@ -19,6 +23,12 @@ const AuthProvider = ({ children }) => {
         setLoading(true);
         return signInWithEmailAndPassword(auth, email, password)
     }
+
+    const signInWithGoogle = () =>{
+        setLoading(true)
+        return signInWithPopup(auth, googleProvider);
+    }
+
 
     const logOut = () => {       //eikhane logOut neya hoise signOut nei nai karon vitore signOut firebase thika call kora jaibo na taile
         setLoading(true);
@@ -42,6 +52,7 @@ const AuthProvider = ({ children }) => {
         loading,
         createUser,
         signInUser,
+        signInWithGoogle,
         logOut
     }
 
